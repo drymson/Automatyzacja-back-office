@@ -2,6 +2,16 @@
   <div class="inventory">
     <h1 class="title">Rejestr zapasów spożywczych i chemicznych</h1>
 
+    <!-- Powiadomienia o niskim stanie zapasów -->
+    <div v-if="lowStock.length" class="alerts">
+      <h3>Uwaga! Niski stan zapasów:</h3>
+      <ul>
+        <li v-for="item in lowStock" :key="item.id">
+          {{ item.name }} (ilość: {{ item.quantity }})
+        </li>
+      </ul>
+    </div>
+
     <div class="filter-bar">
       <input
         v-model="filters.category"
@@ -98,6 +108,7 @@ export default {
       modalOpen: false,
       selectedSupply: null,
       form: { name: '', quantity: 0, category: '', location: '' },
+      lowStock: [],  // <-- tutaj dodane pole
     };
   },
   methods: {
@@ -136,6 +147,7 @@ export default {
         await axios[method](url, this.form);
         this.closeModal();
         this.fetchSupplies();
+        this.fetchLowStockAlerts();  // odśwież alerty po zmianie danych
       } catch (error) {
         console.error(error);
         alert('Błąd przy zapisywaniu zapasu.');
@@ -144,15 +156,27 @@ export default {
     deleteSupply(id) {
       axios
         .delete(`/api/supplies/${id}`)
-        .then(() => this.fetchSupplies())
+        .then(() => {
+          this.fetchSupplies();
+          this.fetchLowStockAlerts();  // odśwież alerty po usunięciu
+        })
         .catch(err => {
           console.error(err);
           alert('Błąd przy usuwaniu zapasu.');
         });
     },
+    async fetchLowStockAlerts() {
+      try {
+        const res = await axios.get('/api/supplies/alerts');
+        this.lowStock = res.data;
+      } catch {
+        this.lowStock = [];
+      }
+    },
   },
   mounted() {
     this.fetchSupplies();
+    this.fetchLowStockAlerts();  // pobierz alerty przy załadowaniu
   },
 };
 </script>
@@ -347,6 +371,24 @@ export default {
 
 .ml-auto {
   margin-left: auto;
+}
+
+.alerts {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  color: #856404;
+  font-weight: 600;
+}
+.alerts h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+.alerts ul {
+  margin: 0;
+  padding-left: 1.2rem;
 }
 
 /* Responsywność */

@@ -2,6 +2,16 @@
   <div class="inventory">
     <h1 class="title">Rejestr zasobów biurowych</h1>
 
+    <!-- Powiadomienia o niskim stanie zapasów -->
+    <div v-if="lowStock.length" class="alerts">
+      <h3>Uwaga! Niski stan zapasów:</h3>
+      <ul>
+        <li v-for="item in lowStock" :key="item.id">
+          {{ item.name }} (ilość: {{ item.quantity }})
+        </li>
+      </ul>
+    </div>
+
     <div class="filter-bar">
       <input
         v-model="filters.type"
@@ -99,6 +109,7 @@ export default {
       modalOpen: false,
       selectedItem: null,
       form: { name: '', type: '', quantity: 0, location: '' },
+      lowStock: [], // dodano obsługę alertów
     };
   },
   methods: {
@@ -137,6 +148,7 @@ export default {
         .then(() => {
           this.closeModal();
           this.fetchInventory();
+          this.fetchLowStockAlerts(); // odśwież alerty po zapisie
         })
         .catch(err => {
           console.error(err);
@@ -146,15 +158,29 @@ export default {
     deleteItem(id) {
       axios
         .delete(`/api/office-resources/${id}`)
-        .then(() => this.fetchInventory())
+        .then(() => {
+          this.fetchInventory();
+          this.fetchLowStockAlerts(); // odśwież alerty po usunięciu
+        })
         .catch(err => {
           console.error(err);
           alert('Błąd przy usuwaniu zasobu.');
         });
     },
+    fetchLowStockAlerts() {
+      axios
+        .get('/api/office-resources/alerts')
+        .then(res => {
+          this.lowStock = res.data;
+        })
+        .catch(() => {
+          this.lowStock = [];
+        });
+    },
   },
   mounted() {
     this.fetchInventory();
+    this.fetchLowStockAlerts(); // pobierz alerty przy załadowaniu
   },
 };
 </script>
@@ -222,32 +248,27 @@ export default {
   background-color: #27ae60;
 }
 
-/* Wrapper for responsive horizontal scroll */
 .table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 2rem;
 }
-
-/* Table styles */
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Zapewnia minimalną szerokość, aby tabela miała sens */
+  min-width: 600px;
 }
 .table th,
 .table td {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border: 1px solid #ddd;
   text-align: left;
-  vertical-align: middle;
   word-wrap: break-word;
-  white-space: normal; /* Pozwala na łamanie tekstu w komórkach */
+  white-space: normal;
 }
 .table th {
   background-color: #ecf0f1;
   color: #2c3e50;
-  font-weight: 600;
 }
 .table tr:hover {
   background: #f0fdf4;
@@ -257,16 +278,14 @@ export default {
   color: #888;
   font-style: italic;
   padding: 1.5rem;
-  background: #fafafa;
 }
-
 .action {
   margin-right: 1rem;
   cursor: pointer;
   background: none;
   border: none;
   font-weight: bold;
-  padding: 0;
+  font-size: 0.9rem;
 }
 .edit {
   color: #2563eb;
@@ -280,7 +299,6 @@ export default {
 .delete:hover {
   text-decoration: underline;
 }
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -316,20 +334,26 @@ export default {
   justify-self: end;
   font-weight: 600;
 }
-
 .modal-actions {
   grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 .save {
   background-color: #2563eb;
   color: white;
 }
+.cancel {
+  background-color: #e74c3c;
+  color: white;
+}
 .save:hover {
   background-color: #2057d0;
+}
+.cancel:hover {
+  background-color: #c0392b;
 }
 .fade-enter-active,
 .fade-leave-active {
@@ -339,43 +363,49 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
-
 .ml-auto {
   margin-left: auto;
 }
-
-/* Responsywność */
+.alerts {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  color: #856404;
+  font-weight: 600;
+}
+.alerts h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+.alerts ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
 @media (max-width: 768px) {
   .title {
     font-size: 1.5rem;
   }
-
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
   }
-
   .input {
     width: 100%;
   }
-
-  /* Nie ukrywamy tabeli, ale zapewniamy, że kontener scrolluje */
   .table {
-    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+    min-width: 600px;
   }
-
   .modal-form {
     grid-template-columns: 1fr;
   }
-
   .form-label {
     justify-self: start;
   }
-
   .modal {
     padding: 1rem;
   }
-
   .modal-title {
     font-size: 1.1rem;
   }

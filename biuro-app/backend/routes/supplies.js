@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const supplies = require('../db/supplies');
+const knex = require('../db/knex');
 
 router.get('/', async (req, res) => {
   try {
@@ -9,6 +10,15 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('GET /api/supplies error:', error);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/alerts', async (req, res) => {
+  try {
+    const lowStockItems = await knex('supplies').where('quantity', '<', 3);
+    res.json(lowStockItems);
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd pobierania alertów' });
   }
 });
 

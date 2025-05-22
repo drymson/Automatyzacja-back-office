@@ -35,11 +35,15 @@
       <button @click="togglePanel('tickets')" class="nav-button">🎫 Zgłoszenia</button>
     </div>
 
-    <transition name="fade">
-      <div class="section" v-show="activePanel">
+    <transition
+      name="slide-fade"
+      mode="out-in"
+    >
+      <div class="section" v-if="activePanel">
         <component :is="getComponentForPanel()" />
       </div>
     </transition>
+
   </div>
 </template>
 
@@ -203,6 +207,27 @@ export default {
   border-top: 1px solid #ddd;
   padding-top: 2rem;
   overflow: hidden;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.4s ease;
+  overflow: hidden;
+  max-height: 1000px;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+}
+
+.slide-fade-enter-to,
+.slide-fade-leave-from {
+  opacity: 1;
+  max-height: 1000px;
+  transform: translateY(0);
 }
 
 @media (max-width: 768px) {

@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const knex = require('knex')(require('../db/knexfile').development);
 
+router.get('/alerts', async (req, res) => {
+  try {
+    const lowStockItems = await knex('office_resources').where('quantity', '<', 3);
+    res.json(lowStockItems);
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd pobierania alertów' });
+  }
+});
+
 router.get('/', async (req, res) => {
   const { type, sortBy = 'id', order = 'asc' } = req.query;
 
