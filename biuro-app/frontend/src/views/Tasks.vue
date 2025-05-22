@@ -6,34 +6,36 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj zadanie</button>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Tytuł</th>
-          <th>Opis</th>
-          <th>Status</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="task in tasks" :key="task.id">
-          <td>{{ task.title }}</td>
-          <td>{{ task.description }}</td>
-          <td>
-            <span :class="task.status === 'done' ? 'status-done' : 'status-pending'">
-              {{ task.status === 'done' ? 'Wykonane' : 'Do wykonania' }}
-            </span>
-          </td>
-          <td>
-            <button class="action edit" @click="openModal(task)">Edytuj</button>
-            <button class="action delete" @click="deleteTask(task.id)">Usuń</button>
-          </td>
-        </tr>
-        <tr v-if="tasks.length === 0">
-          <td colspan="4" class="no-data">Brak zadań.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tytuł</th>
+            <th>Opis</th>
+            <th>Status</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="task in tasks" :key="task.id">
+            <td>{{ task.title }}</td>
+            <td>{{ task.description }}</td>
+            <td>
+              <span :class="task.status === 'done' ? 'status-done' : 'status-pending'">
+                {{ task.status === 'done' ? 'Wykonane' : 'Do wykonania' }}
+              </span>
+            </td>
+            <td>
+              <button class="action edit" @click="openModal(task)">Edytuj</button>
+              <button class="action delete" @click="deleteTask(task.id)">Usuń</button>
+            </td>
+          </tr>
+          <tr v-if="tasks.length === 0">
+            <td colspan="4" class="no-data">Brak zadań.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <transition name="fade">
       <div v-if="modalOpen" class="modal-overlay" @click.self="closeModal">
@@ -41,18 +43,18 @@
           <h2 class="modal-title">
             {{ editingTask ? 'Edytuj zadanie' : 'Dodaj zadanie' }}
           </h2>
-          <form @submit.prevent="submitForm" class="modal-form-vertical">
+          <form @submit.prevent="submitForm" class="modal-form">
             <div class="form-row">
               <label class="form-label">Tytuł</label>
-              <input v-model="form.title" class="input input-field" required />
+              <input v-model="form.title" class="input" required />
             </div>
             <div class="form-row">
               <label class="form-label">Opis</label>
-              <input v-model="form.description" class="input input-field" />
+              <input v-model="form.description" class="input" />
             </div>
             <div class="form-row">
               <label class="form-label">Status</label>
-              <select v-model="form.status" class="input input-field" required>
+              <select v-model="form.status" class="input" required>
                 <option value="pending">Do wykonania</option>
                 <option value="done">Wykonane</option>
               </select>
@@ -163,10 +165,8 @@ export default {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
-  flex-shrink: 0;
-}
-.full-width {
   width: 100%;
+  box-sizing: border-box;
 }
 .button {
   padding: 0.5rem 1rem;
@@ -177,7 +177,7 @@ export default {
   font-size: 0.95rem;
   background: #e0e0e0;
   color: #333;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .add {
   background-color: #2ecc71;
@@ -191,7 +191,7 @@ export default {
   color: white;
 }
 .save:hover {
-  background-color: #1e40af;
+  background-color: #2057d0;
 }
 .cancel {
   background-color: #e74c3c;
@@ -200,9 +200,19 @@ export default {
 .cancel:hover {
   background-color: #c0392b;
 }
+
+/* RESPONSYWNY WRAPPER DLA TABELI */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 2rem;
+}
+
+/* tabela z minimalną szerokością, by zachować czytelność */
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
   margin-bottom: 2rem;
 }
 .table th,
@@ -210,10 +220,15 @@ export default {
   padding: 1rem;
   border: 1px solid #ddd;
   text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
 }
 .table th {
   background-color: #ecf0f1;
   color: #2c3e50;
+}
+.table tr:hover {
+  background: #f0fdf4;
 }
 .no-data {
   text-align: center;
@@ -221,6 +236,7 @@ export default {
   font-style: italic;
   padding: 1.5rem;
 }
+
 .action {
   margin-right: 1rem;
   cursor: pointer;
@@ -241,6 +257,7 @@ export default {
 .delete:hover {
   text-decoration: underline;
 }
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -257,15 +274,13 @@ export default {
   max-width: 500px;
   width: 100%;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 .modal-title {
   font-size: 1.3rem;
   margin-bottom: 1rem;
   text-align: center;
 }
+
 .modal-form {
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -279,6 +294,7 @@ export default {
   justify-self: end;
   font-weight: 600;
 }
+
 .modal-actions {
   grid-column: 1 / -1;
   display: flex;
@@ -286,6 +302,7 @@ export default {
   gap: 1rem;
   margin-top: 1rem;
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -294,30 +311,9 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
+
 .ml-auto {
   margin-left: auto;
-}
-
-.modal-form-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 400px;
-}
-
-.input-field {
-  width: 100%;
-  max-width: 300px;
-}
-
-.modal-form-vertical .form-row {
-  display: flex;
-  flex-direction: column;
-}
-.modal-form-vertical .form-label {
-  margin-bottom: 0.25rem;
-  font-weight: 600;
 }
 
 .status-done {
@@ -327,5 +323,34 @@ export default {
 .status-pending {
   color: #e67e22;
   font-weight: 600;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .input {
+    width: 100%;
+  }
+  .table {
+    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+  }
+  .modal-form {
+    grid-template-columns: 1fr;
+  }
+  .form-label {
+    justify-self: start;
+  }
+  .modal {
+    padding: 1rem;
+  }
+  .modal-title {
+    font-size: 1.1rem;
+  }
 }
 </style>

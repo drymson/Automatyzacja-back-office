@@ -14,32 +14,34 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj nowy</button>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Nazwa</th>
-          <th>Kategoria</th>
-          <th>Ilość</th>
-          <th>Lokalizacja</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="supply in supplies" :key="supply.id">
-          <td>{{ supply.name }}</td>
-          <td>{{ supply.category }}</td>
-          <td>{{ supply.quantity }}</td>
-          <td>{{ supply.location || '-' }}</td>
-          <td>
-            <button class="action edit" @click="openModal(supply)">Edytuj</button>
-            <button class="action delete" @click="deleteSupply(supply.id)">Usuń</button>
-          </td>
-        </tr>
-        <tr v-if="supplies.length === 0">
-          <td colspan="5" class="no-data">Brak zapasów.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nazwa</th>
+            <th>Kategoria</th>
+            <th>Ilość</th>
+            <th>Lokalizacja</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="supply in supplies" :key="supply.id">
+            <td>{{ supply.name }}</td>
+            <td>{{ supply.category }}</td>
+            <td>{{ supply.quantity }}</td>
+            <td>{{ supply.location || '-' }}</td>
+            <td>
+              <button class="action edit" @click="openModal(supply)">Edytuj</button>
+              <button class="action delete" @click="deleteSupply(supply.id)">Usuń</button>
+            </td>
+          </tr>
+          <tr v-if="supplies.length === 0">
+            <td colspan="5" class="no-data">Brak zapasów.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <transition name="fade">
       <div v-if="modalOpen" class="modal-overlay" @click.self="closeModal">
@@ -218,16 +220,26 @@ export default {
   background-color: #27ae60;
 }
 
+/* RESPONSYWNY WRAPPER DLA TABELI */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 2rem;
+}
+
+/* tabela z minimalną szerokością, by zachować czytelność */
 .table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 2rem;
+  min-width: 600px;
 }
 .table th,
 .table td {
   padding: 1rem;
   border: 1px solid #ddd;
   text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
 }
 .table th {
   background-color: #ecf0f1;
@@ -258,7 +270,7 @@ export default {
   text-decoration: underline;
 }
 .delete {
-  color: #dc2626;
+  color: #c0392b;
 }
 .delete:hover {
   text-decoration: underline;
@@ -335,5 +347,42 @@ export default {
 
 .ml-auto {
   margin-left: auto;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  /* Nie ukrywamy tabeli, ale zapewniamy, że kontener scrolluje */
+  .table {
+    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+  }
+
+  .modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-label {
+    justify-self: start;
+  }
+
+  .modal {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
 }
 </style>

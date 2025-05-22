@@ -15,30 +15,32 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj zgłoszenie</button>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Tytuł</th>
-          <th>Opis</th>
-          <th>Status</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="ticket in tickets" :key="ticket.id">
-          <td>{{ ticket.subject }}</td>
-          <td>{{ ticket.description }}</td>
-          <td>{{ formatStatus(ticket.status) }}</td>
-          <td>
-            <button class="action edit" @click="openModal(ticket)">Edytuj</button>
-            <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
-          </td>
-        </tr>
-        <tr v-if="tickets.length === 0">
-          <td colspan="4" class="no-data">Brak zgłoszeń.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tytuł</th>
+            <th>Opis</th>
+            <th>Status</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="ticket in tickets" :key="ticket.id">
+            <td>{{ ticket.subject }}</td>
+            <td>{{ ticket.description }}</td>
+            <td :class="getStatusClass(ticket.status)">{{ formatStatus(ticket.status) }}</td>
+            <td>
+              <button class="action edit" @click="openModal(ticket)">Edytuj</button>
+              <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
+            </td>
+          </tr>
+          <tr v-if="tickets.length === 0">
+            <td colspan="4" class="no-data">Brak zgłoszeń.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <transition name="fade">
       <div v-if="modalOpen" class="modal-overlay" @click.self="closeModal">
@@ -119,28 +121,28 @@ export default {
       this.modalOpen = false;
       this.selectedTicket = null;
     },
-  async submitForm() {
-    try {
-      const url = this.selectedTicket
-        ? `/api/tickets/${this.selectedTicket.id}`
-        : '/api/tickets';
-      const method = this.selectedTicket ? 'put' : 'post';
+    async submitForm() {
+      try {
+        const url = this.selectedTicket
+          ? `/api/tickets/${this.selectedTicket.id}`
+          : '/api/tickets';
+        const method = this.selectedTicket ? 'put' : 'post';
 
-      const payload = {
-        subject: this.form.title,
-        description: this.form.description,
-        status: this.form.status,
-        priority: 'normal'
-      };
+        const payload = {
+          subject: this.form.title,
+          description: this.form.description,
+          status: this.form.status,
+          priority: 'normal'
+        };
 
-      await axios[method](url, payload);
-      this.closeModal();
-      this.fetchTickets();
-    } catch (error) {
-      console.error(error);
-      alert('Błąd przy zapisywaniu zgłoszenia.');
-    }   
-  },
+        await axios[method](url, payload);
+        this.closeModal();
+        this.fetchTickets();
+      } catch (error) {
+        console.error(error);
+        alert('Błąd przy zapisywaniu zgłoszenia.');
+      }   
+    },
     deleteTicket(id) {
       axios
         .delete(`/api/tickets/${id}`)
@@ -162,6 +164,10 @@ export default {
           return status;
       }
     },
+    getStatusClass(status) {
+      const validStatuses = ['open', 'in_progress', 'closed'];
+      return validStatuses.includes(status) ? `status-${status}` : '';
+    }
   },
   mounted() {
     this.fetchTickets();
@@ -198,6 +204,7 @@ export default {
   border-radius: 8px;
   font-size: 1rem;
   width: 200px;
+  box-sizing: border-box;
 }
 .button {
   padding: 0.5rem 1rem;
@@ -209,6 +216,7 @@ export default {
   background: #e0e0e0;
   color: #333;
   transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
 }
 .apply {
   background-color: #3498db;
@@ -232,16 +240,22 @@ export default {
   background-color: #27ae60;
 }
 
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;
+  min-width: 600px; /* żeby wymusić przewijanie na wąskich ekranach */
 }
 .table th,
 .table td {
   padding: 1rem;
   border: 1px solid #ddd;
   text-align: left;
+  vertical-align: middle;
 }
 .table th {
   background-color: #ecf0f1;
@@ -272,7 +286,7 @@ export default {
   text-decoration: underline;
 }
 .delete {
-  color: #dc2626;
+  color: #c0392b;
 }
 .delete:hover {
   text-decoration: underline;
@@ -327,6 +341,18 @@ export default {
 .save:hover {
   background-color: #2057d0;
 }
+.status-open {
+  color: #e67e22;
+  font-weight: 600;
+}
+.status-in_progress {
+  color: #2563eb;
+  font-weight: 600;
+}
+.status-closed {
+  color: #27ae60;
+  font-weight: 600;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -337,5 +363,32 @@ export default {
 }
 .ml-auto {
   margin-left: auto;
+}
+
+/* RESPONSYWNOŚĆ */
+@media (max-width: 600px) {
+  .filter-bar {
+    flex-direction: column;
+  }
+  .input {
+    width: 100% !important;
+  }
+  .button {
+    width: 100%;
+    white-space: normal;
+  }
+  .ml-auto {
+    margin-left: 0 !important;
+  }
+  .modal-form {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .form-label {
+    justify-self: start !important;
+  }
+  .modal-actions {
+    justify-content: center !important;
+  }
 }
 </style>

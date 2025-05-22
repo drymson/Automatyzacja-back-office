@@ -29,14 +29,14 @@
     </div>
 
     <div class="button-group">
-      <button @click="togglePanel('inventory')" class="nav-button">✏️ Zasoby biurowe</button>
+      <button @click="togglePanel('inventory')" class="nav-button">📂 Zasoby biurowe</button>
       <button @click="togglePanel('supplies')" class="nav-button">📦 Zapasy spożywcze i chemiczne</button>
       <button @click="togglePanel('tasks')" class="nav-button">✅ Zadania</button>
       <button @click="togglePanel('tickets')" class="nav-button">🎫 Zgłoszenia</button>
     </div>
 
     <transition name="fade">
-      <div class="section" v-if="activePanel">
+      <div class="section" v-show="activePanel">
         <component :is="getComponentForPanel()" />
       </div>
     </transition>
@@ -109,35 +109,37 @@ export default {
 .dashboard {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
   font-family: 'Segoe UI', sans-serif;
 }
 
 .title {
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   color: #ffffff;
   background: linear-gradient(135deg, #3498db, #2ecc71);
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   letter-spacing: 1px;
   cursor: pointer;
+  word-break: break-word;
 }
 
 .welcome {
   text-align: center;
   color: #555;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   margin-bottom: 2rem;
+  padding: 0 1rem;
 }
 
 .stats-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -157,17 +159,18 @@ export default {
 }
 
 .card-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
 .card-number {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
 .card-label {
   color: #666;
+  font-size: 0.95rem;
 }
 
 .button-group {
@@ -182,10 +185,13 @@ export default {
   background-color: #3498db;
   color: white;
   text-decoration: none;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   border-radius: 12px;
   font-weight: 600;
+  font-size: 0.95rem;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  flex: 1 1 200px;
+  text-align: center;
 }
 
 .nav-button:hover {
@@ -196,13 +202,50 @@ export default {
 .section {
   border-top: 1px solid #ddd;
   padding-top: 2rem;
+  overflow: hidden;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .card-icon {
+    font-size: 1.8rem;
+  }
+
+  .card-number {
+    font-size: 1.4rem;
+  }
+
+  .card-label {
+    font-size: 0.85rem;
+  }
+
+  .nav-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
+
+@media (max-width: 480px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .nav-button {
+    flex: 1 1 auto;
+  }
 }
 </style>
+

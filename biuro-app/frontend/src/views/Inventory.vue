@@ -14,32 +14,35 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj nowy</button>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Nazwa</th>
-          <th>Kategoria</th>
-          <th>Ilość</th>
-          <th>Lokalizacja</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in inventory" :key="item.id">
-          <td>{{ item.name }}</td>
-          <td>{{ item.type }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.location || '-' }}</td>
-          <td>
-            <button class="action edit" @click="openModal(item)">Edytuj</button>
-            <button class="action delete" @click="deleteItem(item.id)">Usuń</button>
-          </td>
-        </tr>
-        <tr v-if="inventory.length === 0">
-          <td colspan="5" class="no-data">Brak zasobów.</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Responsive container for table -->
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nazwa</th>
+            <th>Kategoria</th>
+            <th>Ilość</th>
+            <th>Lokalizacja</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in inventory" :key="item.id">
+            <td>{{ item.name }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.location || '-' }}</td>
+            <td>
+              <button class="action edit" @click="openModal(item)">Edytuj</button>
+              <button class="action delete" @click="deleteItem(item.id)">Usuń</button>
+            </td>
+          </tr>
+          <tr v-if="inventory.length === 0">
+            <td colspan="5" class="no-data">Brak zasobów.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <transition name="fade">
       <div v-if="modalOpen" class="modal-overlay" @click.self="closeModal">
@@ -219,26 +222,42 @@ export default {
   background-color: #27ae60;
 }
 
+/* Wrapper for responsive horizontal scroll */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 2rem;
+}
+
+/* Table styles */
 .table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 2rem;
+  min-width: 600px; /* Zapewnia minimalną szerokość, aby tabela miała sens */
 }
 .table th,
 .table td {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid #ddd;
   text-align: left;
+  vertical-align: middle;
+  word-wrap: break-word;
+  white-space: normal; /* Pozwala na łamanie tekstu w komórkach */
 }
 .table th {
   background-color: #ecf0f1;
   color: #2c3e50;
+  font-weight: 600;
+}
+.table tr:hover {
+  background: #f0fdf4;
 }
 .no-data {
   text-align: center;
   color: #888;
   font-style: italic;
   padding: 1.5rem;
+  background: #fafafa;
 }
 
 .action {
@@ -247,6 +266,7 @@ export default {
   background: none;
   border: none;
   font-weight: bold;
+  padding: 0;
 }
 .edit {
   color: #2563eb;
@@ -322,5 +342,42 @@ export default {
 
 .ml-auto {
   margin-left: auto;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  /* Nie ukrywamy tabeli, ale zapewniamy, że kontener scrolluje */
+  .table {
+    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+  }
+
+  .modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-label {
+    justify-self: start;
+  }
+
+  .modal {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
 }
 </style>
