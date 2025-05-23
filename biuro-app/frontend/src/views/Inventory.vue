@@ -2,7 +2,6 @@
   <div class="inventory">
     <h1 class="title">Rejestr zasobów biurowych</h1>
 
-    <!-- Powiadomienia o niskim stanie zapasów -->
     <div v-if="lowStock.length" class="alerts">
       <h3>Uwaga! Niski stan zapasów:</h3>
       <ul>
@@ -24,7 +23,22 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj nowy</button>
     </div>
 
-    <!-- Responsive container for table -->
+    <div class="filter-bar" style="margin-bottom: 1rem;">
+      <button @click="exportToPDF" class="button apply with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="18" height="18" style="margin-right: 6px;">
+          <path d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM13 3.5V8h4.5L13 3.5zM7.5 14h1v-4h-1v4zm3 0h1v-4h-1v4zm3 0h1v-4h-1v4z"/>
+        </svg>
+        Eksportuj do PDF
+      </button>
+      <button @click="exportToCSV" class="button apply with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="18" height="18" style="margin-right: 6px;">
+          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-4h2v4z"/>
+        </svg>
+        Eksportuj do CSV
+      </button>
+    </div>
+
+
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -109,17 +123,17 @@ export default {
       modalOpen: false,
       selectedItem: null,
       form: { name: '', type: '', quantity: 0, location: '' },
-      lowStock: [], // dodano obsługę alertów
+      lowStock: [],
     };
   },
   methods: {
     fetchInventory() {
       axios
         .get('/api/office-resources', {
-          params: this.filters.type ? { type: this.filters.type } : {}
+          params: this.filters.type ? { type: this.filters.type } : {},
         })
-        .then(res => (this.inventory = res.data))
-        .catch(err => {
+        .then((res) => (this.inventory = res.data))
+        .catch((err) => {
           console.error(err);
           alert('Błąd przy pobieraniu zasobów.');
         });
@@ -148,9 +162,9 @@ export default {
         .then(() => {
           this.closeModal();
           this.fetchInventory();
-          this.fetchLowStockAlerts(); // odśwież alerty po zapisie
+          this.fetchLowStockAlerts();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           alert('Błąd przy zapisywaniu zasobu.');
         });
@@ -160,9 +174,9 @@ export default {
         .delete(`/api/office-resources/${id}`)
         .then(() => {
           this.fetchInventory();
-          this.fetchLowStockAlerts(); // odśwież alerty po usunięciu
+          this.fetchLowStockAlerts();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           alert('Błąd przy usuwaniu zasobu.');
         });
@@ -170,17 +184,76 @@ export default {
     fetchLowStockAlerts() {
       axios
         .get('/api/office-resources/alerts')
-        .then(res => {
+        .then((res) => {
           this.lowStock = res.data;
         })
         .catch(() => {
           this.lowStock = [];
         });
     },
+
+    exportToPDF() {
+      const docDefinition = {
+        content: [
+          { text: 'Rejestr zasobów biurowych', style: 'header' },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['*', '*', '*', '*'],
+              body: [
+                ['Nazwa', 'Kategoria', 'Ilość', 'Lokalizacja'],
+                ...this.inventory.map(item => [
+                  item.name,
+                  item.type,
+                  item.quantity,
+                  item.location || '-',
+                ]),
+              ],
+            },
+          },
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            marginBottom: 15,
+          },
+        },
+        defaultStyle: {
+          font: 'Roboto',
+        },
+      };
+
+      pdfMake.createPdf(docDefinition).download('rejestr_zasobów.pdf');
+    },
+
+    exportToCSV() {
+      const headers = ['Nazwa', 'Kategoria', 'Ilość', 'Lokalizacja'];
+      const rows = this.inventory.map(item => [
+        item.name,
+        item.type,
+        item.quantity,
+        item.location || '-',
+      ]);
+
+      const csvContent =
+        'data:text/csv;charset=utf-8,' +
+        [headers, ...rows]
+          .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'rejestr_zasobów.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   },
   mounted() {
     this.fetchInventory();
-    this.fetchLowStockAlerts(); // pobierz alerty przy załadowaniu
+    this.fetchLowStockAlerts();
   },
 };
 </script>

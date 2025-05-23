@@ -24,6 +24,11 @@
       <button @click="openModal()" class="button add ml-auto">+ Dodaj nowy</button>
     </div>
 
+    <div class="filter-bar" style="margin-bottom: 1rem;">
+      <button @click="exportToPDF" class="button apply">Eksportuj do PDF</button>
+      <button @click="exportToCSV" class="button apply">Eksportuj do CSV</button>
+    </div>
+
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -108,7 +113,7 @@ export default {
       modalOpen: false,
       selectedSupply: null,
       form: { name: '', quantity: 0, category: '', location: '' },
-      lowStock: [],  // <-- tutaj dodane pole
+      lowStock: [],
     };
   },
   methods: {
@@ -147,7 +152,7 @@ export default {
         await axios[method](url, this.form);
         this.closeModal();
         this.fetchSupplies();
-        this.fetchLowStockAlerts();  // odśwież alerty po zmianie danych
+        this.fetchLowStockAlerts();
       } catch (error) {
         console.error(error);
         alert('Błąd przy zapisywaniu zapasu.');
@@ -158,7 +163,7 @@ export default {
         .delete(`/api/supplies/${id}`)
         .then(() => {
           this.fetchSupplies();
-          this.fetchLowStockAlerts();  // odśwież alerty po usunięciu
+          this.fetchLowStockAlerts();
         })
         .catch(err => {
           console.error(err);
@@ -173,10 +178,77 @@ export default {
         this.lowStock = [];
       }
     },
+
+    // --- DODANE METODY EXPORTU ---
+
+    exportToPDF() {
+      if (!window.pdfMake) {
+        alert('pdfMake nie jest załadowany!');
+        return;
+      }
+
+      const docDefinition = {
+        content: [
+          { text: 'Rejestr zapasów', style: 'header' },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['*', '*', 'auto', '*'],
+              body: [
+                ['Nazwa', 'Kategoria', 'Ilość', 'Lokalizacja'],
+                ...this.supplies.map(s => [
+                  s.name,
+                  s.category,
+                  s.quantity.toString(),
+                  s.location || '-'
+                ]),
+              ]
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            marginBottom: 15,
+          }
+        },
+        defaultStyle: {
+          fontSize: 12,
+        }
+      };
+
+      window.pdfMake.createPdf(docDefinition).download('rejestr_zapasów.pdf');
+    },
+
+    exportToCSV() {
+      if (!this.supplies.length) {
+        alert('Brak danych do eksportu.');
+        return;
+      }
+
+      const headers = ['Nazwa', 'Kategoria', 'Ilość', 'Lokalizacja'];
+      const rows = this.supplies.map(s => [
+        `"${s.name.replace(/"/g, '""')}"`,
+        `"${s.category.replace(/"/g, '""')}"`,
+        s.quantity,
+        `"${(s.location || '-').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'rejestr_zapasów.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   },
   mounted() {
     this.fetchSupplies();
-    this.fetchLowStockAlerts();  // pobierz alerty przy załadowaniu
+    this.fetchLowStockAlerts();
   },
 };
 </script>

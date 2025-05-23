@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "axios": "^1.9.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "papaparse": "^5.5.3",
+    "pdf-lib": "^1.17.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
   },
@@ -20,6 +22,7 @@
     "@tailwindcss/postcss": "^4.1.7",
     "@vitejs/plugin-vue": "^5.2.3",
     "autoprefixer": "^10.4.21",
+    "pdfmake": "^0.1.70",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7",
     "vite": "^6.3.5"
