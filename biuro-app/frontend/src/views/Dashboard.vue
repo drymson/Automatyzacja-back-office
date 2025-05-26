@@ -35,6 +35,17 @@
       <button @click="togglePanel('tickets')" class="nav-button">🎫 Zgłoszenia</button>
     </div>
 
+  <div class="dark-toggle">
+    <button
+      @click="toggleDarkMode"
+      class="nav-button"
+      :class="darkMode ? 'light-active' : 'dark-active'"
+    >
+      {{ darkMode ? '☀️ Tryb jasny' : '🌙 Tryb ciemny' }}
+    </button>
+  </div>
+
+
     <transition
       name="slide-fade"
       mode="out-in"
@@ -70,6 +81,7 @@ export default {
       tasksDone: 0,
       ticketsOpen: 0,
       activePanel: null,
+      darkMode: false,
     };
   },
   methods: {
@@ -84,6 +96,10 @@ export default {
         case 'tickets': return 'Tickets';
         default: return null;
       }
+    },
+    toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+      document.documentElement.classList.toggle('dark-mode', this.darkMode);
     }
   },
   mounted() {
@@ -196,6 +212,7 @@ export default {
   transition: background-color 0.3s ease, transform 0.2s ease;
   flex: 1 1 200px;
   text-align: center;
+  cursor: pointer;
 }
 
 .nav-button:hover {
@@ -228,6 +245,18 @@ export default {
   opacity: 1;
   max-height: 1000px;
   transform: translateY(0);
+}
+
+.dark-mode .title {
+  background: linear-gradient(135deg, #2a2a2a, #1e1e1e);
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode td:hover,
+.dark-mode th:hover {
+  background-color: #333333;
 }
 
 @media (max-width: 768px) {
@@ -274,3 +303,90 @@ export default {
 }
 </style>
 
+<style>
+.dark-toggle .dark-active {
+  background-color: #333333 !important;
+  color: white !important;
+  border: 1px solid #555555 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+.dark-toggle .light-active {
+  background-color: #f0f0f0 !important;
+  color: #222 !important;
+  border: 1px solid #cccccc !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+}
+.dark-mode .dashboard {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .welcome {
+  color: #ffffff;
+}
+
+.dark-mode .card {
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.85);
+  color: #ffffff;
+  border: 1px solid #333;
+}
+
+.dark-mode .card:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.85);
+}
+
+.dark-mode .card-label {
+  color: #ffffff;
+}
+
+.dark-mode .nav-button,
+.dark-mode button,
+.dark-mode .button-group button {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dark-mode .nav-button:hover,
+.dark-mode button:hover,
+.dark-mode .button-group button:hover {
+  background-color: #1d1d1d;
+  border-color: #666;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode .nav-button:focus,
+.dark-mode button:focus,
+.dark-mode .button-group button:focus {
+  outline: 2px solid #999999;
+  outline-offset: 2px;
+  background-color: #242424;
+  box-shadow: 0 0 8px #999999;
+}
+
+.dark-toggle {
+  position: fixed !important;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.dark-mode a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.dark-mode a:hover {
+  color: #ffffff;
+}
+
+.dark-mode .dashboard *:focus {
+  outline-offset: 2px;
+  outline: 2px solid #999999;
+}
+</style>

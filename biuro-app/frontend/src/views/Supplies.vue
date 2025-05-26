@@ -2,7 +2,6 @@
   <div class="inventory">
     <h1 class="title">Rejestr zapasów spożywczych i chemicznych</h1>
 
-    <!-- Powiadomienia o niskim stanie zapasów -->
     <div v-if="lowStock.length" class="alerts">
       <h3>Uwaga! Niski stan zapasów:</h3>
       <ul>
@@ -25,8 +24,18 @@
     </div>
 
     <div class="filter-bar" style="margin-bottom: 1rem;">
-      <button @click="exportToPDF" class="button apply">Eksportuj do PDF</button>
-      <button @click="exportToCSV" class="button apply">Eksportuj do CSV</button>
+      <button @click="exportToPDF" class="button apply with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="18" height="18" style="margin-right: 6px;">
+          <path d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM13 3.5V8h4.5L13 3.5zM7.5 14h1v-4h-1v4zm3 0h1v-4h-1v4zm3 0h1v-4h-1v4z"/>
+        </svg>
+        Eksportuj do PDF
+      </button>
+      <button @click="exportToCSV" class="button apply with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="18" height="18" style="margin-right: 6px;">
+          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-4h2v4z"/>
+        </svg>
+        Eksportuj do CSV
+      </button>
     </div>
 
     <div class="table-wrapper">
@@ -316,14 +325,12 @@ export default {
   background-color: #27ae60;
 }
 
-/* RESPONSYWNY WRAPPER DLA TABELI */
 .table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 2rem;
 }
 
-/* tabela z minimalną szerokością, by zachować czytelność */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -463,7 +470,134 @@ export default {
   padding-left: 1.2rem;
 }
 
-/* Responsywność */
+.inventory {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.dark-mode .inventory {
+  background: #1c1c1c;
+  color: #ffffff;
+}
+
+.dark-mode .title {
+  border-bottom-color: #3b82f6;
+}
+
+.dark-mode .input {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+}
+
+.dark-mode .button,
+.dark-mode .apply,
+.dark-mode .cancel,
+.dark-mode .add,
+.dark-mode .save {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dark-mode .button:hover,
+.dark-mode .apply:hover,
+.dark-mode .cancel:hover,
+.dark-mode .add:hover,
+.dark-mode .save:hover {
+  background-color: #1d1d1d;
+  border-color: #666;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode .button:focus,
+.dark-mode .apply:focus,
+.dark-mode .cancel:focus,
+.dark-mode .add:focus,
+.dark-mode .save:focus {
+  outline: 2px solid #999999;
+  outline-offset: 2px;
+  background-color: #242424;
+  box-shadow: 0 0 8px #999999;
+}
+
+.dark-mode .table th {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border-color: #444;
+}
+
+.dark-mode .table td {
+  background-color: #1f1f1f;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.dark-mode .table tr:hover {
+  background: #0e0e0e;
+}
+
+.dark-mode .alerts {
+  background-color: #3a2f00;
+  border: 1px solid #5c4200;
+  color: #ffd700;
+}
+
+.dark-mode .no-data {
+  color: #ffffff;
+}
+
+.dark-mode .action.edit,
+.dark-mode .action.delete {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 4px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.dark-mode .action.edit {
+  color: #60a5fa;
+}
+
+.dark-mode .action.delete {
+  color: #f87171;
+}
+
+.dark-mode .action.edit:hover,
+.dark-mode .action.delete:hover {
+  text-decoration: underline;
+  background: none;
+}
+
+.dark-mode .edit-modal,
+.dark-mode .modal,
+.dark-mode .modal-content {
+  background-color: #121212;
+  color: #ffffff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.dark-mode .form-label {
+  color: #ffffff;
+}
+
+.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 1.5rem;
@@ -477,10 +611,9 @@ export default {
   .input {
     width: 100%;
   }
-
-  /* Nie ukrywamy tabeli, ale zapewniamy, że kontener scrolluje */
+  
   .table {
-    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+    min-width: 600px;
   }
 
   .modal-form {

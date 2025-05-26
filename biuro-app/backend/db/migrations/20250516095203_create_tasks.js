@@ -3,7 +3,7 @@ exports.up = function(knex) {
     table.increments('id').primary();
     table.string('title').notNullable();
     table.text('description');
-    table.string('status').notNullable().defaultTo('pending'); // pending, done
+    table.string('status').notNullable().defaultTo('pending');
     table.timestamps(true, true);
   });
 };

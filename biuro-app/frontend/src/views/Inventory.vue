@@ -456,6 +456,121 @@ export default {
   margin: 0;
   padding-left: 1.2rem;
 }
+
+.dark-mode html,
+.dark-mode body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .inventory {
+  background: #1c1c1c;
+}
+
+.dark-mode .edit-modal,
+.dark-mode .modal,
+.dark-mode .modal-content {
+  background-color: #121212;
+  color: #ffffff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.dark-mode .input,
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+}
+
+.dark-mode label,
+.dark-mode .form-label {
+  color: #ffffff;
+}
+
+.dark-mode .button,
+.dark-mode button,
+.dark-mode .nav-button,
+.dark-mode .button-group button {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dark-mode .button:hover,
+.dark-mode button:hover,
+.dark-mode .nav-button:hover,
+.dark-mode .button-group button:hover {
+  background-color: #1d1d1d;
+  border-color: #666;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode .button:focus,
+.dark-mode button:focus {
+  outline: 2px solid #999999;
+  outline-offset: 2px;
+  background-color: #242424;
+  box-shadow: 0 0 8px #999999;
+}
+
+.dark-mode .table th {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border-color: #444;
+}
+
+.dark-mode .table td {
+  background-color: #1f1f1f;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.dark-mode .table tr:hover {
+  background: #0e0e0e;
+}
+
+.dark-mode .alerts {
+  background-color: #3a2f00;
+  border: 1px solid #5c4200;
+  color: #ffd700;
+}
+
+.dark-mode .no-data {
+  color: #aaa;
+}
+
+.dark-mode .action.edit,
+.dark-mode .action.delete {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 4px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.dark-mode .action.edit {
+  color: #60a5fa;
+}
+
+.dark-mode .action.delete {
+  color: #f87171;
+}
+
+.dark-mode .action.edit:hover,
+.dark-mode .action.delete:hover {
+  text-decoration: underline;
+  background: none;
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 1.5rem;

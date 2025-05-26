@@ -9,6 +9,9 @@ async function getById(id) {
 }
 
 async function create(data) {
+  if (!data.created_at) {
+    data.created_at = new Date();
+  }
   const [newTicket] = await knex('tickets').insert(data).returning('*');
   return newTicket;
 }

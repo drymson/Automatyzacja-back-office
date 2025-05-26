@@ -25,11 +25,11 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status, created_at } = req.body;
     if (!title || !status || (status !== 'pending' && status !== 'done')) {
       return res.status(400).json({ error: 'Invalid input' });
     }
-    const newItem = await tasks.create({ title, description, status });
+    const newItem = await tasks.create({ title, description, status, created_at });
     res.status(201).json(newItem);
   } catch (error) {
     console.error(error);
@@ -39,11 +39,11 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status, created_at } = req.body;
     if (!title || !status || (status !== 'pending' && status !== 'done')) {
       return res.status(400).json({ error: 'Invalid input' });
     }
-    const updated = await tasks.update(req.params.id, { title, description, status });
+    const updated = await tasks.update(req.params.id, { title, description, status, created_at });
     if (!updated) return res.status(404).json({ error: 'Not found' });
     res.json(updated);
   } catch (error) {

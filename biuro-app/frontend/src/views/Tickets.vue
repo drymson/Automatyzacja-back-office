@@ -2,7 +2,6 @@
   <div class="inventory">
     <h1 class="title">Rejestr zgłoszeń</h1>
 
-    <!-- FILTRY -->
     <div class="filter-bar">
       <input
         v-model="filters.status"
@@ -22,6 +21,7 @@
             <th>Tytuł</th>
             <th>Opis</th>
             <th>Status</th>
+            <th>Data utworzenia</th>
             <th>Akcje</th>
           </tr>
         </thead>
@@ -30,13 +30,14 @@
             <td>{{ ticket.subject }}</td>
             <td>{{ ticket.description }}</td>
             <td :class="getStatusClass(ticket.status)">{{ formatStatus(ticket.status) }}</td>
+            <td>{{ formatDate(ticket.created_at) }}</td>
             <td>
               <button class="action edit" @click="openModal(ticket)">Edytuj</button>
               <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
             </td>
           </tr>
           <tr v-if="tickets.length === 0">
-            <td colspan="4" class="no-data">Brak zgłoszeń.</td>
+            <td colspan="5" class="no-data">Brak zgłoszeń.</td>
           </tr>
         </tbody>
       </table>
@@ -64,6 +65,15 @@
                 <option value="in_progress">W trakcie</option>
                 <option value="closed">Zamknięte</option>
               </select>
+              <div class="form-row">
+                <label class="form-label">Data</label>
+                <input
+                  v-model="form.date"
+                  type="datetime-local"
+                  class="input"
+                  required
+                />
+              </div>
             </div>
             <div class="modal-actions">
               <button type="button" @click="closeModal" class="button cancel">Anuluj</button>
@@ -87,7 +97,7 @@ export default {
       filters: { status: '' },
       modalOpen: false,
       selectedTicket: null,
-      form: { title: '', description: '', status: 'open' },
+      form: { title: '', description: '', status: 'open', date: '' },
     };
   },
   methods: {
@@ -102,6 +112,20 @@ export default {
         alert('Błąd podczas pobierania zgłoszeń.');
       }
     },
+    formatForInput(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const pad = (num) => num.toString().padStart(2, '0');
+
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1);
+      const day = pad(date.getDate());
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    },
+
     resetFilters() {
       this.filters.status = '';
       this.fetchTickets();
@@ -113,9 +137,22 @@ export default {
             title: ticket.subject,
             description: ticket.description,
             status: ticket.status,
+            date: ticket.created_at ? this.formatForInput(ticket.created_at) : ''
           }
-        : { title: '', description: '', status: 'open' };
+        : { title: '', description: '', status: 'open', date: '' };
       this.modalOpen = true;
+    },
+    
+    formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pl-PL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     },
     closeModal() {
       this.modalOpen = false;
@@ -132,8 +169,10 @@ export default {
           subject: this.form.title,
           description: this.form.description,
           status: this.form.status,
-          priority: 'normal'
+          created_at: new Date(this.form.date).toISOString(),
+          priority: 'normal',
         };
+
 
         await axios[method](url, payload);
         this.closeModal();
@@ -365,7 +404,141 @@ export default {
   margin-left: auto;
 }
 
-/* RESPONSYWNOŚĆ */
+.dark-mode .inventory {
+  background: #1c1c1c;
+  color: #ffffff;
+}
+
+.dark-mode .title {
+  border-bottom-color: #3b82f6;
+}
+
+.dark-mode .input,
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+}
+
+.dark-mode label,
+.dark-mode .form-label {
+  color: #ffffff;
+}
+
+.dark-mode .button,
+.dark-mode button,
+.dark-mode .apply,
+.dark-mode .cancel,
+.dark-mode .add,
+.dark-mode .save {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dark-mode .button:hover,
+.dark-mode button:hover,
+.dark-mode .apply:hover,
+.dark-mode .cancel:hover,
+.dark-mode .add:hover,
+.dark-mode .save:hover {
+  background-color: #1d1d1d;
+  border-color: #666;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode .button:focus,
+.dark-mode button:focus,
+.dark-mode .apply:focus,
+.dark-mode .cancel:focus,
+.dark-mode .add:focus,
+.dark-mode .save:focus {
+  outline: 2px solid #999999;
+  outline-offset: 2px;
+  background-color: #242424;
+  box-shadow: 0 0 8px #999999;
+}
+
+.dark-mode .table td.status-open {
+  color: #e67e22 !important;
+  font-weight: 600;
+}
+.dark-mode .table td.status-in_progress {
+  color: #2563eb !important;
+  font-weight: 600;
+}
+.dark-mode .table td.status-closed {
+  color: #27ae60 !important;
+  font-weight: 600;
+}
+
+.dark-mode .table th {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border-color: #444;
+}
+
+.dark-mode .table td {
+  background-color: #1f1f1f;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.dark-mode .table tr:hover {
+  background: #0e0e0e;
+}
+
+.dark-mode .no-data {
+  color: #ffffff;
+}
+
+.dark-mode .action.edit,
+.dark-mode .action.delete {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 4px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.dark-mode .action.edit {
+  color: #60a5fa;
+}
+
+.dark-mode .action.delete {
+  color: #f87171;
+}
+
+.dark-mode .action.edit:hover,
+.dark-mode .action.delete:hover {
+  text-decoration: underline;
+  background: none;
+}
+
+.dark-mode .modal,
+.dark-mode .modal-content {
+  background-color: #121212;
+  color: #ffffff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.dark-mode .modal-title {
+  color: #ffffff;
+}
+
+.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 @media (max-width: 600px) {
   .filter-bar {
     flex-direction: column;

@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dark-mode html,
+.dark-mode body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode tr:hover > td,
+.dark-mode tr:hover > th {
+  background-color: #333333 !important;
+  transition: background-color 0.3s ease;
+}

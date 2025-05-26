@@ -13,6 +13,7 @@
             <th>Tytuł</th>
             <th>Opis</th>
             <th>Status</th>
+            <th>Data</th>
             <th>Akcje</th>
           </tr>
         </thead>
@@ -25,13 +26,14 @@
                 {{ task.status === 'done' ? 'Wykonane' : 'Do wykonania' }}
               </span>
             </td>
+            <td>{{ formatDate(task.created_at) }}</td>
             <td>
               <button class="action edit" @click="openModal(task)">Edytuj</button>
               <button class="action delete" @click="deleteTask(task.id)">Usuń</button>
             </td>
           </tr>
           <tr v-if="tasks.length === 0">
-            <td colspan="4" class="no-data">Brak zadań.</td>
+            <td colspan="5" class="no-data">Brak zadań.</td>
           </tr>
         </tbody>
       </table>
@@ -59,6 +61,10 @@
                 <option value="done">Wykonane</option>
               </select>
             </div>
+            <div class="form-row">
+              <label class="form-label">Data</label>
+              <input v-model="form.created_at" class="input" type="date" required />
+            </div>
 
             <div class="modal-actions">
               <button type="button" @click="closeModal" class="button cancel">Anuluj</button>
@@ -85,6 +91,7 @@ export default {
         title: '',
         description: '',
         status: 'pending',
+        created_at: '',
       },
     };
   },
@@ -97,22 +104,46 @@ export default {
     },
     openModal(task = null) {
       this.editingTask = task;
-      this.form = task
-        ? { ...task }
-        : { title: '', description: '', status: 'pending' };
+      if (task) {
+        const formattedDate = new Date(task.created_at).toISOString().split('T')[0];
+        this.form = { ...task, created_at: formattedDate };
+      } else {
+        this.form = {
+          title: '',
+          description: '',
+          status: 'pending',
+          created_at: new Date().toISOString().split('T')[0],
+        };
+      }
       this.modalOpen = true;
     },
-    closeModal() {
-      this.modalOpen = false;
-      this.editingTask = null;
-      this.form = { title: '', description: '', status: 'pending' };
+
+      closeModal() {
+        this.modalOpen = false;
+        this.editingTask = null;
+        this.form = {
+        title: '',
+        description: '',
+        status: 'pending',
+        created_at: new Date().toISOString().split('T')[0],
+     };
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      return new Date(dateString).toLocaleDateString('pl-PL', options)
     },
     async submitForm() {
       try {
+        const formData = {
+          ...this.form,
+          created_at: new Date(this.form.created_at).toISOString(),
+        }
         if (this.editingTask) {
-          await axios.put(`/api/tasks/${this.editingTask.id}`, this.form);
+          await axios.put(`/api/tasks/${this.editingTask.id}`, formData);
         } else {
-          await axios.post('/api/tasks', this.form);
+          await axios.post('/api/tasks', formData);
         }
         this.closeModal();
         this.fetchTasks();
@@ -325,7 +356,130 @@ export default {
   font-weight: 600;
 }
 
-/* Responsywność */
+.dark-mode .inventory {
+  background: #1c1c1c;
+  color: #ffffff;
+}
+
+.dark-mode .title {
+  border-bottom-color: #3b82f6;
+}
+
+.dark-mode .input,
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+}
+
+.dark-mode .button,
+.dark-mode button,
+.dark-mode .apply,
+.dark-mode .cancel,
+.dark-mode .add,
+.dark-mode .save {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dark-mode .button:hover,
+.dark-mode button:hover,
+.dark-mode .apply:hover,
+.dark-mode .cancel:hover,
+.dark-mode .add:hover,
+.dark-mode .save:hover {
+  background-color: #1d1d1d;
+  border-color: #666;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dark-mode .button:focus,
+.dark-mode button:focus,
+.dark-mode .apply:focus,
+.dark-mode .cancel:focus,
+.dark-mode .add:focus,
+.dark-mode .save:focus {
+  outline: 2px solid #999999;
+  outline-offset: 2px;
+  background-color: #242424;
+  box-shadow: 0 0 8px #999999;
+}
+
+.dark-mode .edit-modal,
+.dark-mode .modal,
+.dark-mode .modal-content {
+  background-color: #121212;
+  color: #ffffff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark-mode .form-label {
+  color: #ffffff;
+}
+
+.dark-mode .table th {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  border-color: #444;
+}
+
+.dark-mode .table td {
+  background-color: #1f1f1f;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.dark-mode .table tr:hover {
+  background: #0e0e0e;
+}
+
+.dark-mode .alerts {
+  background-color: #3a2f00;
+  border: 1px solid #5c4200;
+  color: #ffd700;
+}
+
+.dark-mode .no-data {
+  color: #ffffff;
+}
+
+.dark-mode .action.edit,
+.dark-mode .action.delete {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 4px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.dark-mode .action.edit {
+  color: #60a5fa;
+}
+
+.dark-mode .action.delete {
+  color: #f87171;
+}
+
+.dark-mode .action.edit:hover,
+.dark-mode .action.delete:hover {
+  text-decoration: underline;
+  background: none;
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 1.5rem;
@@ -338,7 +492,7 @@ export default {
     width: 100%;
   }
   .table {
-    min-width: 600px; /* zapewnia minimalną szerokość na małych ekranach */
+    min-width: 600px;
   }
   .modal-form {
     grid-template-columns: 1fr;
