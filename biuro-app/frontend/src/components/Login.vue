@@ -34,6 +34,12 @@ const login = async () => {
       sessionStorage.setItem('email', res.data.email);
       sessionStorage.setItem('user_id', userId);
     }
+    else {
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('role', res.data.role);
+      sessionStorage.setItem('email', res.data.email);
+      sessionStorage.setItem('user_id', userId);
+    }
 
     router.push('/dashboard');
   } catch (e) {
