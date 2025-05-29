@@ -55,6 +55,16 @@
       </div>
     </transition>
 
+  <div class="account-menu">
+    <div @click="toggleAccountMenu" class="account-icon">
+      👤
+    </div>
+    <div v-if="showAccountMenu" class="account-dropdown">
+      <router-link to="/account" class="dropdown-item">Szczegóły konta</router-link>
+      <div @click="logout" class="dropdown-item logout">Wyloguj się</div>
+    </div>
+  </div>
+
   </div>
 </template>
 
@@ -82,6 +92,7 @@ export default {
       ticketsOpen: 0,
       activePanel: null,
       darkMode: false,
+      showAccountMenu: false,
     };
   },
   methods: {
@@ -100,9 +111,38 @@ export default {
     toggleDarkMode() {
       this.darkMode = !this.darkMode;
       document.documentElement.classList.toggle('dark-mode', this.darkMode);
+    },
+    toggleAccountMenu() {
+      this.showAccountMenu = !this.showAccountMenu;
+    },
+    logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('email');
+
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('email');
+
+    if (axios.defaults.headers.common['Authorization']) {
+      delete axios.defaults.headers.common['Authorization'];
     }
+
+    this.activePanel = null;
+    this.showAccountMenu = false;
+
+    this.$router.push('/').then(() => {
+      window.location.reload();
+    });
+  },
+
   },
   mounted() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+
     axios.get('/api/office-resources')
       .then(res => { this.inventoryCount = res.data.length; })
       .catch(() => {});
@@ -259,6 +299,66 @@ export default {
   background-color: #333333;
 }
 
+.account-menu {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.account-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  text-align: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+}
+
+.account-icon:hover {
+  background-color: #2980b9;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: 3.5rem;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
+  min-width: 160px;
+  z-index: 1001;
+}
+
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
+  color: #333;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.logout {
+  color: red;
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 2rem;
@@ -389,4 +489,23 @@ export default {
   outline-offset: 2px;
   outline: 2px solid #999999;
 }
+
+.dark-mode .account-dropdown {
+  background-color: #1f1f1f;
+  color: white;
+  border: 1px solid #444;
+}
+
+.dark-mode .dropdown-item {
+  color: white;
+}
+
+.dark-mode .dropdown-item:hover {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .logout {
+  color: #ff6b6b;
+}
+
 </style>

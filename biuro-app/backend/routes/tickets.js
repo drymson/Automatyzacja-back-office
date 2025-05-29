@@ -26,10 +26,14 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   console.log('POST /api/tickets body:', req.body);
   try {
-    const { subject, description, status, priority, created_at } = req.body;
+    const { subject, description, status, priority, created_at, user_id } = req.body;
 
     if (!subject || typeof subject !== 'string') {
       return res.status(400).json({ error: 'Subject is required and must be a string' });
+    }
+
+    if (!user_id) {
+      return res.status(400).json({ error: 'User ID is required' });
     }
 
     const newItem = await tickets.create({
@@ -37,7 +41,8 @@ router.post('/', async (req, res) => {
       description,
       status,
       priority,
-      created_at: created_at ? new Date(created_at) : new Date()
+      created_at: created_at ? new Date(created_at) : new Date(),
+      user_id,
     });
 
     res.status(201).json(newItem);

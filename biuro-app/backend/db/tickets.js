@@ -1,7 +1,9 @@
 const knex = require('./knex');
 
 async function getAll() {
-  return await knex('tickets').select('*');
+  return await knex('tickets')
+    .select('tickets.*', 'users.username')
+    .leftJoin('users', 'tickets.user_id', 'users.id');
 }
 
 async function getById(id) {

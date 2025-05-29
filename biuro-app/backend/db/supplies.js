@@ -1,4 +1,4 @@
-const knex = require('knex')(require('../db/knexfile').development);
+const knex = require('knex')(require('../knexfile').development);
 
 async function getAll({ category, sortBy = 'id', order = 'asc' }) {
   const validSortColumns = ['id', 'name', 'category', 'quantity', 'location'];

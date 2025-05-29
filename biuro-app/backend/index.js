@@ -1,6 +1,9 @@
+require('dotenv').config()
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -17,12 +20,15 @@ const suppliesRoutes = require('./routes/supplies');
 const tasksRoutes = require('./routes/tasks');
 const ticketsRoutes = require('./routes/tickets');
 const assetsRoutes = require('./routes/assets');
+const accountRoutes = require('./routes/account');
 
 app.use('/api/office-resources', officeResourcesRoutes);
 app.use('/api/supplies', suppliesRoutes);
 app.use('/api/tasks', tasksRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/assets', assetsRoutes);
+app.use('/api/auth', authRouter);
+app.use('/api', accountRoutes);
 
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 

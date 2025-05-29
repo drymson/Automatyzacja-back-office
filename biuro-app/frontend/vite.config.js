@@ -14,4 +14,12 @@ export default defineConfig({
       '/api': 'http://localhost:4000',
     },
   },
+  optimizeDeps: {
+    include: ['jwt-decode'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
 });

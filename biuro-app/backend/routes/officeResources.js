@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const knex = require('knex')(require('../db/knexfile').development);
+const knex = require('knex')(require('../knexfile').development);
 
 router.get('/alerts', async (req, res) => {
   try {

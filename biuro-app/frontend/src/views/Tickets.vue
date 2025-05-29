@@ -22,6 +22,7 @@
             <th>Opis</th>
             <th>Status</th>
             <th>Data utworzenia</th>
+            <th>Dodane przez</th>
             <th>Akcje</th>
           </tr>
         </thead>
@@ -31,13 +32,14 @@
             <td>{{ ticket.description }}</td>
             <td :class="getStatusClass(ticket.status)">{{ formatStatus(ticket.status) }}</td>
             <td>{{ formatDate(ticket.created_at) }}</td>
+            <td>{{ ticket.username || 'Nieznany' }}</td>
             <td>
               <button class="action edit" @click="openModal(ticket)">Edytuj</button>
               <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
             </td>
           </tr>
           <tr v-if="tickets.length === 0">
-            <td colspan="5" class="no-data">Brak zgłoszeń.</td>
+            <td colspan="6" class="no-data">Brak zgłoszeń.</td>
           </tr>
         </tbody>
       </table>
@@ -52,7 +54,7 @@
           <form @submit.prevent="submitForm" class="modal-form">
             <div class="form-row">
               <label class="form-label">Tytuł</label>
-              <input v-model="form.title" class="input" required />
+              <input v-model="form.subject" class="input" required />
             </div>
             <div class="form-row">
               <label class="form-label">Opis</label>
@@ -97,7 +99,7 @@ export default {
       filters: { status: '' },
       modalOpen: false,
       selectedTicket: null,
-      form: { title: '', description: '', status: 'open', date: '' },
+      form: { subject: '', description: '', status: 'open', date: '' },
     };
   },
   methods: {
@@ -134,12 +136,12 @@ export default {
       this.selectedTicket = ticket;
       this.form = ticket
         ? {
-            title: ticket.subject,
+            subject: ticket.subject,
             description: ticket.description,
             status: ticket.status,
             date: ticket.created_at ? this.formatForInput(ticket.created_at) : ''
           }
-        : { title: '', description: '', status: 'open', date: '' };
+        : { subject: '', description: '', status: 'open', date: '' };
       this.modalOpen = true;
     },
     
@@ -166,13 +168,16 @@ export default {
         const method = this.selectedTicket ? 'put' : 'post';
 
         const payload = {
-          subject: this.form.title,
+          subject: this.form.subject,
           description: this.form.description,
           status: this.form.status,
-          created_at: new Date(this.form.date).toISOString(),
           priority: 'normal',
+          user_id: Number(localStorage.getItem('user_id')) || Number(sessionStorage.getItem('user_id')),
+          ...(this.form.date ? { created_at: new Date(this.form.date).toISOString() } : {}),
         };
 
+
+        console.log('Payload:', payload);
 
         await axios[method](url, payload);
         this.closeModal();
@@ -287,7 +292,7 @@ export default {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;
-  min-width: 600px; /* żeby wymusić przewijanie na wąskich ekranach */
+  min-width: 600px;
 }
 .table th,
 .table td {
