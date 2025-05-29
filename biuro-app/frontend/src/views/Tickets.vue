@@ -33,7 +33,7 @@
             <td :class="getStatusClass(ticket.status)">{{ formatStatus(ticket.status) }}</td>
             <td>{{ formatDate(ticket.created_at) }}</td>
             <td>{{ ticket.username || 'Nieznany' }}</td>
-            <td>
+            <td class="action-buttons">
               <button class="action edit" @click="openModal(ticket)">Edytuj</button>
               <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
             </td>
@@ -323,6 +323,25 @@ export default {
   font-weight: bold;
   font-size: 0.9rem;
 }
+
+.action-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+}
+
+.action-buttons .action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+}
+
 .edit {
   color: #2563eb;
 }

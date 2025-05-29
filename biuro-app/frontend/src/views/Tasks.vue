@@ -232,14 +232,12 @@ export default {
   background-color: #c0392b;
 }
 
-/* RESPONSYWNY WRAPPER DLA TABELI */
 .table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 2rem;
 }
 
-/* tabela z minimalną szerokością, by zachować czytelność */
 .table {
   width: 100%;
   border-collapse: collapse;
