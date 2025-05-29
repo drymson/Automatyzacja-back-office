@@ -33,9 +33,9 @@
             <td :class="getStatusClass(ticket.status)">{{ formatStatus(ticket.status) }}</td>
             <td>{{ formatDate(ticket.created_at) }}</td>
             <td>{{ ticket.username || 'Nieznany' }}</td>
-            <td class="action-buttons">
-              <button class="action edit" @click="openModal(ticket)">Edytuj</button>
-              <button class="action delete" @click="deleteTicket(ticket.id)">Usuń</button>
+            <td>
+              <button class="action edit" @click="openModal(task)">Edytuj</button>
+              <button class="action delete" @click="deleteTask(task.id)">Usuń</button>
             </td>
           </tr>
           <tr v-if="tickets.length === 0">
@@ -322,24 +322,8 @@ export default {
   border: none;
   font-weight: bold;
   font-size: 0.9rem;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: stretch;
-  height: 100%;
-}
-
-.action-buttons .action {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  width: 100%;
-  height: 100%;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
 }
 
 .edit {

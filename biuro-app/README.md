@@ -1,25 +1,80 @@
-# Biuro App
+# Instrukcja uruchomienia projektu **biuro-app**
 
-## Opis projektu
+## 1. Pobranie projektu
 
-Biuro App to aplikacja webowa zintegrowana z backendem (Node.js + Express) oraz frontendem (Vue.js), uruchamiana na porcie **4000**.  
-Backend korzysta z bazy danych PostgreSQL o nazwie `biuro_app`. Frontend jest zbudowany i serwowany przez backend.
+Z pobranego archiwum GitHub rozpakuj projekt i przejdź do katalogu `biuro-app`.
 
----
-
-## Wymagania
-
-- **Node.js** (zalecana wersja 16+)
-- **npm** (domyślnie instalowany z Node.js)
-- **PostgreSQL** (zalecana wersja 12+)
-- System operacyjny: Windows (zalecane, zgodnie z użyciem autora)
+Przeczytaj plik `README.md` znajdujący się w katalogu `biuro-app`.
 
 ---
 
-## Konfiguracja i uruchomienie
+## 2. Instalacja zależności
 
-### 1. Klonowanie repozytorium
+W katalogu `biuro-app`:
 
 ```bash
-git clone <URL_DO_REPOZYTORIUM>
-cd biuro-app
+cd backend
+npm install
+
+cd ../frontend
+npm install
+```
+
+---
+
+## 3. Konfiguracja bazy danych
+
+1. Utwórz lokalną bazę danych PostgreSQL o nazwie `biuro_app`.
+2. Upewnij się, że masz użytkownika `postgres` z hasłem `webwizards`, lub zmodyfikuj plik `.env` według własnych danych.
+
+Plik `.env` znajduje się w katalogu `backend/.env` i powinien wyglądać np. tak:
+
+```env
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=webwizards
+DB_NAME=biuro_app
+PORT=4000
+```
+
+> Dostosuj plik `.env` do swoich ustawień bazy danych, jeśli są inne.
+
+---
+
+## 4. Migracje bazy danych
+
+W katalogu `backend` uruchom migracje, aby utworzyć tabele w bazie danych:
+
+```bash
+npx knex migrate:latest --knexfile db/knexfile.js
+```
+
+---
+
+## 5. Budowanie frontendu (opcjonalnie)
+
+Jeśli dokonasz zmian w frontendzie i chcesz wygenerować wersję produkcyjną, przejdź do katalogu `frontend` i wykonaj:
+
+```bash
+npm run build
+```
+
+Wygenerowane pliki znajdziesz w folderze `frontend/dist`.
+
+---
+
+## 6. Uruchomienie aplikacji
+
+W katalogu `backend` uruchom serwer Node.js:
+
+```bash
+node index.js
+```
+
+Aplikacja będzie dostępna pod adresem:
+
+```
+http://localhost:4000
+```
+
+Frontend i backend są zintegrowane i dostępne pod tym samym adresem.
